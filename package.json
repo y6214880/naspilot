@@ -1,0 +1,15 @@
+{
+  "name": "naspilot",
+  "version": "1.0.0",
+  "private": true,
+  "description": "NasPilot · 自建服务启动台",
+  "author": "小余 (QQ 6214880)",
+  "license": "MIT",
+  "main": "server/index.js",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node server/index.js"
+  }
+}

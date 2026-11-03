@@ -1,0 +1,29 @@
+# NasPilot · 通用版 compose（群晖 / 极空间 / 绿联 / 威联通 / 任意 Linux）
+# 和 docker-compose.yml 的区别：用绝对路径挂载，不依赖项目目录在哪
+# 用法：把下面每一处 /volume1/docker/naspilot 换成你实际放源码的目录，再导入
+services:
+  naspilot:
+    image: node:22-alpine
+    container_name: naspilot
+    restart: unless-stopped
+    working_dir: /app
+    command: ["node", "server/index.js"]
+    ports:
+      # 左边是宿主机端口，被占用就改成 8898 之类
+      - "8899:8899"
+    environment:
+      - TZ=Asia/Shanghai
+      - NASPLOT_DATA=/app/data
+    volumes:
+      # ① 源码目录（必填，改成你自己的绝对路径）
+      - /volume1/docker/naspilot:/app
+      # ② Docker 控制与容器列表（要启停容器就保持这样，不需要就加 :ro）
+      - /var/run/docker.sock:/var/run/docker.sock
+      # ③ 宿主机端口，用来发现非容器服务（只读）
+      - /proc:/host/proc:ro
+      # ④ 宿主机根目录，只看磁盘容量和挂载点；介意权限可以整行删掉
+      - /:/host/root:ro
+    # 让容器里能用 host.docker.internal 访问 NAS 自己
+    # Docker 20.10 以下不支持 host-gateway，起不来就删掉这两行，不影响面板本身
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

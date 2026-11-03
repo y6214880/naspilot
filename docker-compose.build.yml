@@ -1,0 +1,25 @@
+# NasPilot · 构建镜像版（需要 docker build，镜像更干净，启动更快）
+# 用法：docker compose -f docker-compose.build.yml up -d --build
+# 飞牛图形界面：把下面内容整段贴进 Compose，路径选 naspilot 目录即可
+services:
+  naspilot:
+    build: .
+    image: naspilot:1.0.0
+    container_name: naspilot
+    restart: unless-stopped
+    ports:
+      - "8899:8899"
+    environment:
+      - TZ=Asia/Shanghai
+    volumes:
+      # 配置与统计，务必保留，删掉等于恢复出厂
+      - ./data:/app/data
+      # 读取容器列表与运行状态；不需要启停功能可改成 :ro 只读
+      - /var/run/docker.sock:/var/run/docker.sock
+      # 宿主机监听端口，用于发现飞牛自带应用等非容器服务
+      - /proc:/host/proc:ro
+      # 宿主机根目录（只读），监控里的磁盘容量和挂载点靠它；
+      # 不挂也能跑，只是磁盘那一块不会显示。介意权限可以删掉这一行
+      - /:/host/root:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"

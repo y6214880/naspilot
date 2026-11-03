@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0b0e13" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<title>NasPilot</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+<link rel="manifest" href="/manifest.webmanifest" />
+<link rel="stylesheet" href="/css/app.css?v=__VERSION__" />
+</head>
+<body data-density="standard">
+
+<div class="shell">
+  <aside class="rail">
+    <div class="brand">
+      <svg class="mark" viewBox="0 0 32 32" aria-hidden="true">
+        <rect x="3" y="6" width="26" height="7" rx="2.2" fill="currentColor" opacity=".9"/>
+        <rect x="6" y="15" width="20" height="7" rx="2.2" fill="currentColor" opacity=".55"/>
+        <rect x="9" y="24" width="14" height="4" rx="2" fill="currentColor" opacity=".3"/>
+      </svg>
+      <div class="brand-text">
+        <strong id="brandTitle">NasPilot</strong>
+      </div>
+    </div>
+
+    <label class="search">
+      <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="9" cy="9" r="5.5"/><path d="M13.2 13.2 17 17"/></svg>
+      <input id="search" type="search" placeholder="搜索入口" autocomplete="off" spellcheck="false" />
+    </label>
+
+    <nav class="groups" id="groups"></nav>
+
+    <div class="rail-foot">
+      <div class="foot-row">
+        <span class="rail-stat" id="railStat"></span>
+        <button class="ghost-icon" id="btnSettings" title="设置">
+          <svg viewBox="0 0 20 20"><path d="M3.4 6.6h4.2M11.6 6.6h5M3.4 13.4h6.4M13.8 13.4h2.8"/><circle cx="9.6" cy="6.6" r="1.7"/><circle cx="11.8" cy="13.4" r="1.7"/></svg>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div class="title-block">
+        <h1 id="viewTitle">全部入口</h1>
+        <span id="viewMeta" class="meta"></span>
+      </div>
+      <div class="toolbar">
+        <button class="btn primary" id="btnAdd">
+          <svg viewBox="0 0 20 20"><path d="M10 4.5v11M4.5 10h11"/></svg>
+          <span>添加</span>
+        </button>
+        <button class="ghost-icon pulse-btn" id="btnPulse" title="系统监控" hidden>
+          <svg viewBox="0 0 20 20"><path d="M2.6 11.2h3.1l1.8-4.8 2.6 8 1.9-5.6 1.4 2.4h3.7"/></svg>
+          <b id="pulseVal">--</b>
+        </button>
+        <button class="ghost-icon" id="btnDensity" title="卡片密度">
+          <svg class="density-ico" viewBox="0 0 20 20"><rect x="3" y="3" width="6" height="6" rx="1.5"/><rect x="11" y="3" width="6" height="6" rx="1.5"/><rect x="3" y="11" width="6" height="6" rx="1.5"/><rect x="11" y="11" width="6" height="6" rx="1.5"/></svg>
+        </button>
+        <button class="ghost-icon" id="btnRefresh" title="刷新状态">
+          <svg viewBox="0 0 20 20"><path d="M16.2 8.4A6.3 6.3 0 1 0 16 12"/><path d="M16.6 4.2v4.4h-4.4"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <section class="services" id="services"></section>
+    <div class="empty" id="empty" hidden></div>
+  </main>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<aside class="drawer" id="drawer" hidden>
+  <div class="drawer-head">
+    <h2>设置</h2>
+    <button class="ghost-icon" id="btnCloseDrawer"><svg viewBox="0 0 20 20"><path d="M5 5l10 10M15 5 5 15"/></svg></button>
+  </div>
+  <nav class="tabs" id="setTabs">
+    <button data-tab="general" class="on">通用</button>
+    <button data-tab="security">安全</button>
+    <button data-tab="look">外观</button>
+    <button data-tab="docker">联动</button>
+    <button data-tab="data">数据</button>
+    <button data-tab="about">关于</button>
+  </nav>
+  <div class="drawer-body" id="setBody"></div>
+</aside>
+
+<div class="modal" id="modal" hidden>
+  <div class="modal-box">
+    <div class="modal-head">
+      <h2 id="modalTitle">添加入口</h2>
+      <button class="ghost-icon" data-close-modal><svg viewBox="0 0 20 20"><path d="M5 5l10 10M15 5 5 15"/></svg></button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-foot">
+      <button class="btn danger" id="btnDeleteApp" hidden>删除</button>
+      <span class="spacer"></span>
+      <button class="btn" data-close-modal>取消</button>
+      <button class="btn primary" id="btnSaveApp">保存</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="confirm" hidden>
+  <div class="modal-box sm">
+    <div class="modal-head"><h2 id="confirmTitle">确认</h2></div>
+    <div class="modal-body"><p class="confirm-text" id="confirmText"></p></div>
+    <div class="modal-foot">
+      <span class="spacer"></span>
+      <button class="btn" id="confirmNo">取消</button>
+      <button class="btn primary" id="confirmYes">确定</button>
+    </div>
+  </div>
+</div>
+
+<div class="pulse-pop" id="pulsePop" hidden>
+  <div class="pp-head">
+    <span>系统监控</span>
+    <span class="pp-src" id="ppSrc"></span>
+  </div>
+  <div class="pp-sec">
+    <div class="pp-lab"><span>CPU</span><b id="ppCpu">--</b></div>
+    <svg class="pp-spark" id="ppSpark" viewBox="0 0 120 32" preserveAspectRatio="none" aria-hidden="true">
+      <polyline class="pp-mem-line" points="" />
+      <polyline class="pp-cpu-line" points="" />
+    </svg>
+    <div class="pp-sub"><span id="ppCores">--</span><span id="ppLoad">--</span></div>
+  </div>
+  <div class="pp-sec">
+    <div class="pp-lab"><span>内存</span><b id="ppMem">--</b></div>
+    <div class="pp-bar"><i id="ppMemBar" style="width:0"></i><u id="ppMemCache" style="left:0;width:0"></u></div>
+    <div class="pp-sub"><span id="ppMemDetail">--</span><span class="pp-leg"><i></i>缓存</span></div>
+  </div>
+  <div class="pp-sec" id="ppSwapSec" hidden>
+    <div class="pp-lab"><span>交换分区</span><b id="ppSwap">--</b></div>
+    <div class="pp-bar"><i id="ppSwapBar" style="width:0"></i></div>
+  </div>
+  <div class="pp-sec">
+    <div class="pp-lab"><span>网络</span></div>
+    <div class="pp-net">
+      <div><span class="k">↓</span><b id="ppRx">--</b></div>
+      <div><span class="k">↑</span><b id="ppTx">--</b></div>
+    </div>
+  </div>
+  <div class="pp-sec" id="ppDiskSec" hidden>
+    <div class="pp-lab"><span>磁盘</span><b id="ppDiskIO">--</b></div>
+    <div class="pp-disks" id="ppDisks"></div>
+  </div>
+  <div class="pp-foot"><span id="ppTotal">--</span><span id="ppUp">--</span></div>
+</div>
+
+<div class="density-pop" id="densityPop" hidden>
+  <div class="dpop-title">卡片密度</div>
+  <button data-density="loose">宽松</button>
+  <button data-density="standard">标准</button>
+  <button data-density="compact">紧凑</button>
+</div>
+
+<div class="toasts" id="toasts"></div>
+
+<script src="/js/app.js?v=__VERSION__"></script>
+    <script>
+      window.addEventListener('load', function () {
+        if (window.__naspilotBooted) return;
+        var n = document.createElement('div');
+        n.className = 'boot-error';
+        n.textContent = '界面脚本没加载成功：确认 public/js/app.js 已覆盖，然后强制刷新（Ctrl / ⌘ + Shift + R）。';
+        document.body.appendChild(n);
+      });
+    </script>
+</body>
+</html>

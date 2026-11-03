@@ -1,0 +1,26 @@
+# NasPilot · 免构建部署（推荐，飞牛图形界面直接用这个）
+# 不执行 docker build，直接把源码挂载进 node 容器运行，点一下就能起来
+services:
+  naspilot:
+    image: node:22-alpine
+    container_name: naspilot
+    restart: unless-stopped
+    working_dir: /app
+    command: ["node", "server/index.js"]
+    ports:
+      - "8899:8899"
+    environment:
+      - TZ=Asia/Shanghai
+      - NASPLOT_DATA=/app/data
+    volumes:
+      # 整个项目目录挂进去（含 data/，配置就在 data/config.json，备份拷这个目录即可）
+      - ./:/app
+      # 读取容器列表与控制；不需要启停功能就改成 :ro
+      - /var/run/docker.sock:/var/run/docker.sock
+      # 宿主机监听端口，用于发现飞牛自带应用等非容器服务
+      - /proc:/host/proc:ro
+      # 宿主机根目录（只读），监控里的磁盘容量和挂载点靠它；
+      # 不挂也能跑，只是磁盘那一块不会显示。介意权限可以删掉这一行
+      - /:/host/root:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
